@@ -1,0 +1,56 @@
+"DISPLAY":0
+
+"numsteps":70
+"T":0.25
+"timeHorizon":0.0
+
+# DDDP parameters
+"dux0":1.0
+"duy0":1.0
+
+"cvx0":4.0
+"cx0":12.0
+"cy0":2.0
+
+# road parameters
+"yMin":0.0
+"yMax":10.0
+"xMin":0.0
+"xMax":1000000.0
+
+# controlled vehicle parameters and bounds
+"vdx":30.0
+"vdy":0.0
+"safety_x":1.0
+"safety_y":0.5
+
+"UXMIN":-2.0
+"UXMAX":1.0
+"UYMIN":-1.0
+"UYMAX":1.0
+
+"VXMIN":0.0
+"VXMAX":40.0
+
+# controlled vehicle initial states and more parameters
+"x(0)":5.0
+"y(0)":2.0
+"vx(0)":25.0
+"vy(0)":0.0
+"len":5.0
+"width":2.0
+
+"obst_x(0,0)":80.0
+"obst_y(0,0)":1.5
+"obst_vx(0,0)":20.0
+"obst_vy(0,0)":0.0
+"obst_len(0)":5.0
+"obst_width(0)":2.0
+
+"obst_x(1,0)":130.0
+"obst_y(1,0)":7.5
+"obst_vx(1,0)":20.0
+"obst_vy(1,0)":0.0
+"obst_len(1)":5.0
+"obst_width(1)":2.0
+

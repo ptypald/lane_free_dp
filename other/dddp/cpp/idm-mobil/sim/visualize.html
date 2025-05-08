@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+
+    <style>
+        /* #svg-main {
+            background-color: 'deepskyblue';
+        }
+        #road-rect {
+            fill: #ECEFF1;
+        } */
+
+        
+        /* .v-text-field{
+            width: 1400px;
+        } */
+        
+        .shadow {
+            -webkit-box-shadow: 4px 4px 10px grey;
+            -moz-box-shadow: 4px 4px 10px grey;
+            box-shadow: 4px 4px 10px grey;
+        }
+        svg text {
+            -webkit-user-select: none;
+               -moz-user-select: none;
+                -ms-user-select: none;
+                    user-select: none;
+            pointer-events: none;
+        }
+
+        #myDiv {
+            height: 100%;
+            width: 100%;
+            max-height: inherit; 
+            max-width: inherit;
+            /* background-color: powderblue; */
+        }
+
+        html { overflow-y: auto !important }
+    </style>
+
+    <head>
+        <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+        <link rel="stylesheet" href="common/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="common/vuetify.min.css">
+        <link rel="stylesheet" href="common/c3.min.css">
+        <script src="common/vue.min.js"></script>
+        <script src="common/vuex.min.js"></script>
+        <script src="common/vuetify.min.js"></script>
+        <script src="common/jquery.min.js"></script>
+        <script src="common/d3.v5.min.js" charset="utf-8"></script>
+        <script src="common/c3.min.js"></script>
+        <script src="common/prng.js"></script>
+        <script src="common/chroma.min.js"></script>
+        <script src="data/sim.js"></script>
+        <title> Traffic Fluid </title>
+        <link rel="shortcut icon" type="image/x-icon" href="media/logos/TF_Trans_logo.png" />
+
+        <script src="include/lodash/package/lodash.js"></script>
+        <script src="include/three.js"></script>
+        <script src="include/OrbitControls.js"></script>
+        <script src="include/tween.umd.js"></script>
+        <script src="include/require.js"></script>
+    </head>
+    
+    <body>
+        <v-app id="app" :dark="switchTheme">
+            <v-content>
+                <!-- main toolbar -->
+                <!-- <v-toolbar scroll-off-screen scroll-target="#scrolling-techniques" app>
+                    <v-toolbar-side-icon @click.stop="drawer = !drawer"> 
+                        <v-avatar>
+                            <img src="media/logos/carMini.ico">
+                        </v-avatar> 
+                    </v-toolbar-side-icon>
+                    <v-toolbar-title> 
+                         Visualizer 
+                         <template v-if="d3.data_progress < 100">
+                             loading ... {{d3.data_progress}}%
+                         </template>
+                    </v-toolbar-title>
+                    <v-spacer></v-spacer>
+
+                    <v-menu left offset-y>
+                        <v-btn slot="activator" style="background-color:transparent" flat>
+                                Contact
+                        </v-btn>
+                        <v-list>
+                            <v-list-tile v-for="item in logos" @click="window.open(item.url);">
+                                    <v-list-tile-title> 
+                                            <v-icon small>{{ item.title }}</v-icon>
+                                    </v-list-tile-title>
+                            </v-list-tile>
+                        </v-list>
+                    </v-menu>	    
+                    <v-menu offset-y>
+                            <v-btn slot="activator" icon>
+                                <v-icon>more_vert</v-icon>
+                            </v-btn>
+                            <v-list>
+                                <v-list-tile v-for="(item, index) in items" :key="index" @click="">
+                                        <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                                <v-list-tile>
+                                    <v-switch label="Dark Theme" v-model="switchTheme">
+                                    </v-switch>
+                                </v-list-tile>
+                            </v-list>
+                    </v-menu>		
+                </v-toolbar> -->
+
+                <v-container grid-list-lg fluid>
+                    <v-layout wrap>
+                        <v-flex xs12>
+                            <v-card height="600px">
+                                <v-card-title v-if="d3.data_progress > 100">
+                                    Processing simulation data ... {{d3.data_progress}}%
+                                </v-card-title>
+                                <v-card-title v-else>
+                                    <v-layout justify-end class="">
+                                        <v-flex>
+                                            <v-chip @click="myThreeView.top = !myThreeView.top; console.log(myThreeView.top)"> Top View </v-chip>
+                                            <input type="file" @change="replaceSimFile"/>
+                                        </v-flex>
+                                        <v-btn icon color="transparent" flat  href="https://www.youtube.com/channel/UCWMNxVLWRZ-LGc9OS4WKROQ/" target="_blank">
+                                            <img src="media/logos/youtube_social_icon_red.png" width="50px">
+                                        </v-btn>
+                                       
+                                        <v-btn light href=" https://www.trafficfluid.tuc.gr/en/home" target="_blank">
+                                            <img src="media/logos/TF_Trans_logo.png" height="34px">
+                                        </v-btn>
+                                    </v-layout>
+                                </v-card-title>
+                               
+                                <v-card-media height="65%" id="road-container" v-resize="() => road_container_resize('#road-container')"> 
+                                    <div id="myDiv" style="height: 400px;"></div>
+                                </v-card-media>							
+
+                                 <!-- controls -->
+                                <v-card-actions>
+                                    <v-layout>
+                                        <v-flex xs3 class="">
+                                            <!-- next previous button -->
+                                            <v-btn dark fab small color="pink" @click="play_prev_step()" @mousedown="requestAnimationFrame(play_back_start)" @mouseup="play_stop()">
+                                                <v-icon> skip_previous </v-icon> 
+                                            </v-btn>
+                                            <!-- play/stop button -->
+                                            <v-btn v-if="!play.active" id="playButton" dark fab small color="pink" @click="requestAnimationFrame(play_start)">
+                                                <v-icon> play_arrow </v-icon>
+                                            </v-btn>
+                                            <v-btn v-else id="playButton" dark fab small color="pink"  @click="play_stop()">
+                                                <v-icon> pause </v-icon> 
+                                            </v-btn>
+                                            <!-- next step button -->
+                                            <v-btn dark fab small color="pink" @click="play_next_step()" @mousedown="requestAnimationFrame(play_start)" @mouseup="play_stop()">
+                                                <v-icon> skip_next </v-icon> 
+                                            </v-btn>
+                                            <!-- replay button -->
+                                            <v-btn dark fab small color="pink" @click="() => {play_stop(); play.t = 0; this.vehSelect.active = false;
+                                                this.vehSelect.id = null;}">
+                                                <v-icon> replay </v-icon> 
+                                            </v-btn>
+                                        </v-flex>                                                                
+                                        <v-flex xs5 class="">
+                                            <v-slider thumb-label v-model="play.t" :min="0" :max="sim.k-1"> </v-slider>
+                                        </v-flex>
+                                        <v-flex xs2 class="">
+                                            <v-text-field
+                                                v-model="play.t"
+                                                label="Time Step"
+                                                :suffix="`/ ${sim.k}`"
+                                                style="max-width:110px;"
+                                            ></v-text-field>
+                                            <v-text-field
+                                                v-model="play.t*0.25"
+                                                label="Time (in sec.)"
+                                                :suffix="`/ ${sim.k*0.25}`"
+                                                style="max-width:110px;"
+                                                disabled
+                                            ></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs2>
+                                            <v-subheader>Simulation Speed</v-subheader>
+                                            <v-slider :disabled="play.active" persistent-hint :hint="`x${play.speed}`" v-model="play.speed" :min="1" :max="10"></v-slider>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-card-actions>
+                            </v-card>
+                        </v-flex>
+                        <!-- plots -->
+                        <v-flex xs12>
+                            <v-card>
+                                <v-card-actions>
+                                    <v-select style="max-width: 250px;" label="Select Vehicle" 
+                                        :items="sim.id" 
+                                        v-model="vehSelect.id">
+                                    </v-select>
+        
+                                    <template v-if="vehSelect.id != null">
+                                        <v-chip 
+                                            @click="vehSelect.id = null; vehSelect.active = false"> 
+                                            Vehicle ID: {{vehSelect.id || "None"}} 
+                                        </v-chip>
+                                    </template>
+                                    <v-spacer></v-spacer>
+                                    <v-btn @click="chart_show" color="primary" >Generate</v-btn>
+                                </v-card-actions>
+
+                                <v-card-media v-if="vehSelect.active" class="elevation-1" dark>
+                                    <div id="chart"></div>
+                                </v-card-media>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-content>
+        </v-app>
+    </body>
+
+    <script src="index_chart.js"></script>
+    <script src="main.js"></script>
+
+   
+
+</html>

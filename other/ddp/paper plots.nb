@@ -1,0 +1,151 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      5265,        143]
+NotebookOptionsPosition[      4792,        126]
+NotebookOutlinePosition[      5185,        142]
+CellTagsIndexPosition[      5142,        139]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{"ClearAll", "[", "\"\<Global`*\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"x", "=."}], ";", 
+   RowBox[{"y", "=."}], ";", 
+   RowBox[{"a", "=."}], ";", 
+   RowBox[{"v", "=."}], ";", 
+   RowBox[{"vd", "=."}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ellipse", "[", 
+    RowBox[{"x_", ",", "y_"}], "]"}], ":=", 
+   RowBox[{"Exp", "[", 
+    RowBox[{
+     RowBox[{"-", 
+      RowBox[{"Sqrt", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"x", "-", "obsx"}], ")"}], "^", "2"}], "+", 
+        RowBox[{"p", "*", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"y", "-", "obsy"}], ")"}], "^", "2"}]}]}], " ", "]"}]}], 
+     "/", "gamma"}], "]"}]}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+
+ RowBox[{
+  RowBox[{
+   RowBox[{"D", "[", 
+    RowBox[{
+     RowBox[{"ellipse", "[", 
+      RowBox[{"x", ",", "y"}], "]"}], ",", "y"}], "]"}], "//", "CForm"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"p", "=", "5.0"}], ";", 
+    RowBox[{"gamma", "=", "2.0"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"obsx", "=", "0"}], ";", 
+    RowBox[{"obsy", "=", "0"}], ";"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Show", "[", "\[IndentingNewLine]", 
+    RowBox[{"ContourPlot", "[", 
+     RowBox[{
+      RowBox[{"ellipse", "[", 
+       RowBox[{"x", ",", "y"}], "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"x", ",", 
+        RowBox[{"-", "7"}], ",", "7"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"y", ",", 
+        RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"PlotRange", "->", "All"}], ",", 
+      RowBox[{"AxesLabel", "->", "Automatic"}], ",", 
+      RowBox[{"PlotPoints", "->", "150"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"ImageSize", "->", "500"}], ",", 
+        RowBox[{"ColorFunction", "->", "\"\<AlpineColors\>\""}], ",", 
+        RowBox[{"ColorFunctionScaling", "->", "False"}], ","}], "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{"ImageSize", "->", "500"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"BaseStyle", "->", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"FontFamily", "->", "\"\<Times New Roman\>\""}], ",", 
+         RowBox[{"FontSize", "->", "24"}]}], "}"}]}]}], "]"}], 
+    "\[IndentingNewLine]", "]"}], "*)"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->CompressedData["
+1:eJwdz30sFHAYB/BTUWEpHatsebtTXip0aN7rvLbrDqOr2HnJzZS8XEaddDGV
+t1KGxsz7W6erIaYXmbcVcUsXneY1JqOzkknmpfv+/vjts98f3+/zPIZhMX78
+bRQKxVv5YPGA87S7nuL0bLnuHFxzS/wLmRav1mC/HVvbQ2mqpJUK+751+cDM
+yokAuL0zIghS/PJ40EVkGgdbc7QKYT/NuRRWSNmVMDrwdz2UGHU2wZLqEzLI
+iNf/QnLcO6MwnR81DtXks66eSp9/1+BDo5O0K7BhnCuAFTNxN+FmrSgZevxs
+ToHBJrxUyJOsPIBBbJOHUM3ZLBdm6lOrYGSYUx1McmH1wl1a4Z8gU9Img31V
+z0fgnGXmPLw97fYLltXeJorOdS+TvhKfVcgxYKyTnKU5xUuptGevKgzLjVGH
+L1WEe2H1gLE2XErm68HuxXyiwZBcH2ZzYmlQXkM3J7nYXgvYYhrFgFTHUXvS
+LxSfgTQ/BRPOUYueQd7Cx2ZYUaf5BtY9TpGTeQ3DY/DOj8PzMKqu8Q+Zf62F
+WNJjqOKt1F8m1YTWKgX74IBj8X7I8K84CO9zDhlAXr6HCcx8+MIGdp1nusNR
+LT9PaKi6IwCKs4qDYc2tQj4sq16KgLYzSatxcCyP2Ok6sg4pDkUUAe6NzFOD
+tMnXxCD+lDosURhpwEaDp1Q4rLGiC82mzfXhh3v/aOR/7OsxWGt14DgsOxVq
+DRcTjBlwObnAHsZn2LnA2IUEd2jcHugN59aG2PCNyMYXHtUSBcCt0TYuXG3n
+BkFh9vUr0O5zcxIc56Znk/0uvMiFoQeMnsAbk46l8FK4ehUc6Qish1dTLNvg
+TjfNbpjRPEiMFNQPwFxt+iD0ydIcIz22aYswp0W847pSh1gpUa09ZCjNRnG6
+8FH+KqRbRW7At4zyTbjM6tC7C6c2aNBtosMMbjsyTCxnudtDCnOGBemsWV/4
+/iw9AAq3Ui/Cxl55KNztmyaA7/hT8VDstCGE4zLXNOj1KTFkUKmpzp7LkKPa
+FANzmAwBdNZRJEJh9C/if5sUE8U=
+  "],
+ CellLabel->"In[9]:=",ExpressionUUID->"8e57c26c-9e05-45c9-9a06-bf32ca1952f7"],
+
+Cell["\<\
+-((p*(-obsy + y))/(Power(E,Sqrt(Power(-obsx + x,2) + p*Power(-obsy + \
+y,2))/gamma)*gamma*Sqrt(Power(-obsx + x,2) + p*Power(-obsy + y,2))))\
+\>", "Output",
+ CellChangeTimes->{{3.920374490479392*^9, 3.920374546488508*^9}, {
+   3.920374690077779*^9, 3.920374698450778*^9}, {3.92037475196572*^9, 
+   3.920374821572361*^9}, 3.920530203958849*^9, 3.9205303263252087`*^9, 
+   3.920530370119133*^9},
+ CellLabel->
+  "Out[12]//CForm=",ExpressionUUID->"afd23cdd-d85e-4c97-9f2b-e687948ef8d8"]
+}, Open  ]]
+},
+WindowSize->{1710, 961},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (April 11, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"80ccb4b9-71e1-4e6e-a30e-bd7f83522dac"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 3702, 90, 388, "Input",ExpressionUUID->"8e57c26c-9e05-45c9-9a06-bf32ca1952f7"],
+Cell[4285, 114, 491, 9, 48, "Output",ExpressionUUID->"afd23cdd-d85e-4c97-9f2b-e687948ef8d8"]
+}, Open  ]]
+}
+]
+*)
+
