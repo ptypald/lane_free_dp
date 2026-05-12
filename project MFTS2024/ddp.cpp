@@ -19,7 +19,7 @@ double DDP::ayUp(double aypoint) {
 }
 
 double DDP::ayLow(double aypoint) {
-	return (uymax - aypoint);
+	return (uymin - aypoint);
 }
 
 double DDP::ayLB(double yPoint, double vyPoint, double ayPoint, double dy, double dvy, double day) {
@@ -62,11 +62,13 @@ void DDP::initial_trajectory() {
 	}
 	else {
 		vector<double> temp_init_uy;
-		for (int i = 0; i < numsteps + 1; i++) {
+		for (int i = 0; i < numsteps; i++) {
 			init_vy.push_back(init_uy[i]);
 			if (i != 0)
 				temp_init_uy.push_back((init_vy[i] - init_vy[i - 1]) / step);
 		}
+		init_vy.push_back(init_vy.back());
+		temp_init_uy.push_back(0.0);
 		init_uy.clear();
 		init_uy = temp_init_uy;
 	}
@@ -134,7 +136,6 @@ void DDP::run(Vehicle v) {
 
 				stage[k].alphaStore = alpha; stage[k].betaStore = beta;
 				stage[k].PStore = P; stage[k].QStore = Q;
-				// cout << stage[k].PStore << endl;
 
 				continue;
 			}
@@ -170,11 +171,13 @@ void DDP::run(Vehicle v) {
 
 			for (int o = 0; o < numObs; o++) {
 				double xObs = obs[o].x[k], yObs = obs[o].y[k];
+
 				dxdx += (w5*(2*Power(xObs,4) - 8*Power(xObs,3)*xPoint + 12*Power(xObs,2)*Power(xPoint,2) - 8*xObs*Power(xPoint,3) + 2*Power(xPoint,4) + 2*p*Power(xObs,2)*Power(yObs,2) - 4*p*xObs*xPoint*Power(yObs,2) + 
 					2*p*Power(xPoint,2)*Power(yObs,2) - 4*p*Power(xObs,2)*yObs*yPoint + 8*p*xObs*xPoint*yObs*yPoint - 4*p*Power(xPoint,2)*yObs*yPoint + 2*p*Power(xObs,2)*Power(yPoint,2) - 
 					4*p*xObs*xPoint*Power(yPoint,2) + 2*p*Power(xPoint,2)*Power(yPoint,2) - 2*p*Power(yObs,2)*Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)) + 
 					4*p*yObs*yPoint*Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)) - 2*p*Power(yPoint,2)*Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2))))/
 					(2.*exp(Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)))*Power(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2),2));
+
 				dxdy += (w5*(2*p*Power(xObs,3)*yObs - 6*p*Power(xObs,2)*xPoint*yObs + 6*p*xObs*Power(xPoint,2)*yObs - 2*p*Power(xPoint,3)*yObs + 2*Power(p,2)*xObs*Power(yObs,3) - 
 					2*Power(p,2)*xPoint*Power(yObs,3) - 2*p*Power(xObs,3)*yPoint + 6*p*Power(xObs,2)*xPoint*yPoint - 6*p*xObs*Power(xPoint,2)*yPoint + 2*p*Power(xPoint,3)*yPoint - 
 					6*Power(p,2)*xObs*Power(yObs,2)*yPoint + 6*Power(p,2)*xPoint*Power(yObs,2)*yPoint + 6*Power(p,2)*xObs*yObs*Power(yPoint,2) - 6*Power(p,2)*xPoint*yObs*Power(yPoint,2) - 
@@ -185,6 +188,7 @@ void DDP::run(Vehicle v) {
 					2*p*xPoint*yPoint*Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2))))/
 					(2.*exp(Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)))*
 					Power(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2),2));
+
 				dydx += (w5*(2*p*Power(xObs,3)*yObs - 6*p*Power(xObs,2)*xPoint*yObs + 6*p*xObs*Power(xPoint,2)*yObs - 2*p*Power(xPoint,3)*yObs + 2*Power(p,2)*xObs*Power(yObs,3) - 
 					2*Power(p,2)*xPoint*Power(yObs,3) - 2*p*Power(xObs,3)*yPoint + 6*p*Power(xObs,2)*xPoint*yPoint - 6*p*xObs*Power(xPoint,2)*yPoint + 2*p*Power(xPoint,3)*yPoint - 
 					6*Power(p,2)*xObs*Power(yObs,2)*yPoint + 6*Power(p,2)*xPoint*Power(yObs,2)*yPoint + 6*Power(p,2)*xObs*yObs*Power(yPoint,2) - 6*Power(p,2)*xPoint*yObs*Power(yPoint,2) - 
@@ -195,6 +199,7 @@ void DDP::run(Vehicle v) {
 					2*p*xPoint*yPoint*Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2))))/
 					(2.*exp(Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)))*
 					Power(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2),2));
+
 				dydy += (w5*(2*Power(p,2)*Power(xObs,2)*Power(yObs,2) - 4*Power(p,2)*xObs*xPoint*Power(yObs,2) + 2*Power(p,2)*Power(xPoint,2)*Power(yObs,2) + 2*Power(p,3)*Power(yObs,4) - 
 					4*Power(p,2)*Power(xObs,2)*yObs*yPoint + 8*Power(p,2)*xObs*xPoint*yObs*yPoint - 4*Power(p,2)*Power(xPoint,2)*yObs*yPoint - 8*Power(p,3)*Power(yObs,3)*yPoint + 
 					2*Power(p,2)*Power(xObs,2)*Power(yPoint,2) - 4*Power(p,2)*xObs*xPoint*Power(yPoint,2) + 2*Power(p,2)*Power(xPoint,2)*Power(yPoint,2) + 12*Power(p,3)*Power(yObs,2)*Power(yPoint,2) - 
@@ -204,76 +209,102 @@ void DDP::run(Vehicle v) {
 					2*p*Power(xPoint,2)*Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2))))/
 					(2.*exp(Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)))*
 					Power(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2),2));
+
 				xCoeff += (w5*(xObs - xPoint))/(exp(Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)))*
 					Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)));		
+
 				yCoeff += (w5*(p*yObs - p*yPoint))/(exp(Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)))*
 					Sqrt(Power(xObs,2) - 2*xObs*xPoint + Power(xPoint,2) + p*Power(yObs,2) - 2*p*yObs*yPoint + p*Power(yPoint,2)));
 			}
 	
-			A(0,0) = dxdx; A(0,1) = dxdy; A(0,2) = dxdvx; A(0,3) = dxdvy; A(1,0) = dydx; A(1,1) = dydy; A(1,2) = dydvx; A(1,3) = dydvy; A(2,0) = dvxdx; A(2,1) = dvxdy; A(2,2) = dvxdvx; A(2,3) = dvxdvy; A(3,0) = dvydx; A(3,1) = dvydy; A(3,2) = dvydvx; A(3,3) = dvydvy;
-			B(0,0) = dxdax; B(0,1) = dxday; B(1,0) = dydax; B(1,1) = dyday; B(2,0) = dvxdax; B(2,1) = dvxday; B(3,0) = dvydax; B(3,1) = dvyday;
-			C(0,0) = daxdax; C(0,1) = 0.0; C(1,0) = 0.0; C(1,1) = dayday;
+			A(0,0) = dxdx; A(0,1) = dxdy; A(0,2) = dxdvx; A(0,3) = dxdvy;
+			A(1,0) = dydx; A(1,1) = dydy; A(1,2) = dydvx; A(1,3) = dydvy;
+			A(2,0) = dvxdx; A(2,1) = dvxdy; A(2,2) = dvxdvx; A(2,3) = dvxdvy;
+			A(3,0) = dvydx; A(3,1) = dvydy; A(3,2) = dvydvx; A(3,3) = dvydvy;
+
+			B(0,0) = dxdax; B(0,1) = dxday;
+			B(1,0) = dydax; B(1,1) = dyday;
+			B(2,0) = dvxdax; B(2,1) = dvxday;
+			B(3,0) = dvydax; B(3,1) = dvyday;
+
+			C(0,0) = daxdax; C(0,1) = 0.0;
+			C(1,0) = 0.0; C(1,1) = dayday;
+
 			D(0,0) = axCoeff; D(1,0) = ayCoeff;
 			E(0,0) = xCoeff; E(1,0) = yCoeff; E(2,0) = vxCoeff; E(3,0) = vyCoeff;
 
 			size_t s;
 			CtTemp.clear(); dTemp.clear(); RTemp.clear();
-			// States(0,0) = xPoint; States(1,0) = yPoint; States(2,0) = vxPoint; States(3,0) = vyPoint;
-			States(0,0) = 0.0; States(1,0) = 0.0; States(2,0) = 0.0; States(3,0) = 0.0;
+
+			States(0,0) = 0.0;
+			States(1,0) = 0.0;
+			States(2,0) = 0.0;
+			States(3,0) = 0.0;
+
 			while (true) {
-				qq = -D -B.transpose()*States;
+				qq = -D - B.transpose() * States;
 
 				CtTemp.push_back(0.0); CtTemp.push_back(0.0);
 				dTemp.push_back(0.0);
 				RTemp.push_back(0.0); RTemp.push_back(0.0); RTemp.push_back(0.0); RTemp.push_back(0.0);
 				
-				// check for active constraints
+				// Check for active constraints.
+				// These are the original constant acceleration-bound checks.
 				if (axUp(axPoint) >= 0.0) {
-					CtTemp[0] = -1.0; CtTemp[1] = 0.0;
-					dTemp[0]= axUp(axPoint);
-					for (int i = 0; i < 4; i ++)
-							RTemp[i] = 0.0;
+					CtTemp[0] = -1.0;
+					CtTemp[1] = 0.0;
+					dTemp[0] = axUp(axPoint);
+
+					for (int i = 0; i < 4; i++)
+						RTemp[i] = 0.0;
+
 					fprintf(stderr, "(%d) constraint axUp violated: %.4f | constraint value: %.4f \n", k, axPoint, axUp(axPoint));
 				}
+
 				if (ayUp(ayPoint) >= 0.0) {
 					if (CtTemp[0] == 0.0 && CtTemp[1] == 0.0) {
-						CtTemp[0] = 0.0; CtTemp[1] = -1.0;
-						dTemp[0]= ayUp(ayPoint);
-						for (int i = 0; i < 4; i ++)
+						CtTemp[0] = 0.0;
+						CtTemp[1] = -1.0;
+						dTemp[0] = ayUp(ayPoint);
+
+						for (int i = 0; i < 4; i++)
 							RTemp[i] = 0.0;
 					}
 					else {
-						CtTemp.push_back(0.0); CtTemp.push_back(-1.0);
+						CtTemp.push_back(0.0);
+						CtTemp.push_back(-1.0);
 						dTemp.push_back(ayUp(ayPoint));
-						for (int i = 0; i < 4; i ++)
+
+						for (int i = 0; i < 4; i++)
 							RTemp.push_back(0.0);
 					}
-					fprintf(stderr, "(%d) constraint violated: %.4f | constraint value: %.4f \n", k, axPoint, axUp(axPoint));
+
+					fprintf(stderr, "(%d) constraint ayUp violated: %.4f | constraint value: %.4f \n", k, ayPoint, ayUp(ayPoint));
 				}
 				
 				s = dTemp.size();
-				// convert vector to eigen
+
 				Ct = Eigen::Map<MyMatrix>(CtTemp.data(), s, 2);
 				R = Eigen::Map<MyMatrix>(RTemp.data(), s, 4);
 				d = Eigen::Map<MyMatrix>(dTemp.data(), s, 1);
 
-				// Quadratice Problem for Active Constraints
-				tempCstar = Ct*C.inverse()*Ct.transpose();
+				// Quadratic problem for active constraints.
+				tempCstar = Ct * C.inverse() * Ct.transpose();
 				if (tempCstar.determinant() != 0)
 					tempCstar = tempCstar.inverse();
 
-				Cstar =  tempCstar*Ct*C.inverse();
-				Hstar = C.inverse() - ( C.inverse()*Ct.transpose()*Cstar );
+				Cstar = tempCstar * Ct * C.inverse();
+				Hstar = C.inverse() - (C.inverse() * Ct.transpose() * Cstar);
 				
-				pStar = Hstar*qq + Cstar.transpose() * d;
-				lambdaStar = Cstar*qq - tempCstar*d;
+				pStar = Hstar * qq + Cstar.transpose() * d;
+				lambdaStar = Cstar * qq - tempCstar * d;
 								
 				break;
 			}
 
 			if (s == 1) {
 				if (lambdaStar(0) > 0.0) {
-					Cstar(0) =  Cstar(1) = 0.0;
+					Cstar(0) = Cstar(1) = 0.0;
 					Hstar = C.inverse();
 					d(0) = 0.0;
 					R(0) = R(1) = R(2) = R(3) = 0.0;
@@ -289,93 +320,129 @@ void DDP::run(Vehicle v) {
 				}
 				else if (lambdaStar(0) > 0.0 && lambdaStar(1) <= 0.0) {
 					dTemp.erase(dTemp.begin());
-					for (int i = 0; i < 2; i++)
-						CtTemp.erase(CtTemp.begin() + i);
-					for (int i = 0; i < 4; i++)
-					RTemp.erase(RTemp.begin() + i);
+					CtTemp.erase(CtTemp.begin(), CtTemp.begin() + 2);
+					RTemp.erase(RTemp.begin(), RTemp.begin() + 4);
 
 					cout << "lambda(0) is positive" << endl;
 				}
 				else if (lambdaStar(0) <= 0.0 && lambdaStar(1) > 0.0) {
 					dTemp.erase(dTemp.begin() + 1);
-					for (int i = 2; i < 4; i++)
-						CtTemp.erase(CtTemp.begin() + i);
-					for (int i = 4; i < 8; i++)
-						RTemp.erase(RTemp.begin() + i);
+					CtTemp.erase(CtTemp.begin() + 2, CtTemp.begin() + 4);
+					RTemp.erase(RTemp.begin() + 4, RTemp.begin() + 8);
 
 					cout << "lambda(1) is positive" << endl;
 				}
 
 				s = dTemp.size();
-				// convert vector to eigen
+
 				Ct = Eigen::Map<MyMatrix>(CtTemp.data(), s, 2);
 				R = Eigen::Map<MyMatrix>(RTemp.data(), s, 4);
 				d = Eigen::Map<MyMatrix>(dTemp.data(), s, 1);
-				// Quadratice Problem for Active Constraints
-				tempCstar = Ct*C.inverse()*Ct.transpose();
+
+				tempCstar = Ct * C.inverse() * Ct.transpose();
 				if (tempCstar.determinant() != 0)
 					tempCstar = tempCstar.inverse();
 
-				Cstar =  tempCstar*Ct*C.inverse();
-				Hstar = C.inverse() - ( C.inverse()*Ct.transpose()*Cstar );
+				Cstar = tempCstar * Ct * C.inverse();
+				Hstar = C.inverse() - (C.inverse() * Ct.transpose() * Cstar);
 			}
 		
-			alpha = -Hstar*D + Cstar.transpose()*d;
-			beta  = -Hstar*B.transpose() + Cstar.transpose()*R;
+			alpha = -Hstar * D + Cstar.transpose() * d;
+			beta  = -Hstar * B.transpose() + Cstar.transpose() * R;
 
-			P = A + beta.transpose()*C*beta + B*beta + beta.transpose()*B.transpose();
-			Q = E + beta.transpose()*C*alpha + B*alpha + beta.transpose()*D;
+			P = A + beta.transpose() * C * beta + B * beta + beta.transpose() * B.transpose();
+			Q = E + beta.transpose() * C * alpha + B * alpha + beta.transpose() * D;
 
-			stage[k].alphaStore = alpha; stage[k].betaStore = beta;
-			stage[k].PStore = P; stage[k].QStore = Q;
+			stage[k].alphaStore = alpha;
+			stage[k].betaStore = beta;
+			stage[k].PStore = P;
+			stage[k].QStore = Q;
 		}
 
-		// Eigen::MatrixXf initStates(4,1), iterCost(1,1);
-		// initStates(0) = 15.0; initStates(1) = 2.0; initStates(2) = 25.0; initStates(3) = 0.0;
-		// // cout << 0.5*initStates.transpose()*P*initStates + initStates.transpose()*Q <<endl;
-		// iterCost << 0.5*initStates.transpose()*P*initStates + initStates.transpose()*Q;
-		// fprintf(stderr, "iter Cost: %.4f \n", iterCost(0));
-		
-		// Forward pass
+		// Forward pass.
 		double xDDP, vxDDP, yDDP, vyDDP, uxDDP, uyDDP;
 		double dxDDP, dyDDP, dvxDDP, dvyDDP;
 		double eps = 1.0;
+
 		Eigen::MatrixXf uDDP(2,1), uDDPrev(2,1), statesPoint(4,1);
-		while(true) {
+
+		while (true) {
 			axInitNext.clear(); vxInitNext.clear(); xInitNext.clear();
 			ayInitNext.clear(); vyInitNext.clear(); yInitNext.clear();
 
-			xDDP = init_x[0]; vxDDP = init_vx[0];
-			yDDP = init_y[0]; vyDDP = init_vy[0];
+			xDDP = init_x[0];
+			vxDDP = init_vx[0];
+			yDDP = init_y[0];
+			vyDDP = init_vy[0];
 
-			xInitNext.push_back(xDDP); vxInitNext.push_back(vxDDP);
-			yInitNext.push_back(yDDP); vyInitNext.push_back(vyDDP);
+			xInitNext.push_back(xDDP);
+			vxInitNext.push_back(vxDDP);
+			yInitNext.push_back(yDDP);
+			vyInitNext.push_back(vyDDP);
 
 			for (int k = 0; k < numsteps; k++) {
-				dxDDP = xDDP - init_x[k]; dvxDDP = vxDDP - init_vx[k];
-				dyDDP = yDDP - init_y[k]; dvyDDP = vyDDP - init_vy[k];
+				dxDDP = xDDP - init_x[k];
+				dvxDDP = vxDDP - init_vx[k];
+				dyDDP = yDDP - init_y[k];
+				dvyDDP = vyDDP - init_vy[k];
 
 				uDDPrev << init_ux[k], init_uy[k];
 				statesPoint << dxDDP, dyDDP, dvxDDP, dvyDDP;
 
 				uDDP = uDDPrev + eps * (stage[k].alphaStore + stage[k].betaStore * statesPoint);
-				uxDDP = uDDP(0); uyDDP = uDDP(1);
+				uxDDP = uDDP(0);
+				uyDDP = uDDP(1);
+
+				// Minimal safety projection of the DDP update before forward simulation.
+				// This enforces:
+				// 1. longitudinal acceleration bounds;
+				// 2. nonnegative longitudinal speed;
+				// 3. state-dependent lateral acceleration bounds that keep the vehicle within road boundaries.
+				//
+				// Without this projection, the forward rollout may leave the road even if the backward
+				// pass produces a locally improved control law.
+				double uxLower = std::max(uxmin, -vxDDP / step);
+				uxDDP = std::min(std::max(uxDDP, uxLower), uxmax);
+
+				double lateralCoeff = 0.5 * Klat * step - 2.0 * sqrt(Klat);
+
+				double uyLowerBoundary = -Klat * (yDDP - yMin) + lateralCoeff * vyDDP;
+				double uyUpperBoundary = -Klat * (yDDP - yMax) + lateralCoeff * vyDDP;
+
+				double uyLower = std::max(uymin, uyLowerBoundary);
+				double uyUpper = std::min(uymax, uyUpperBoundary);
+
+				// Numerical guard: if the bounds cross because the current state is already
+				// outside or very near a boundary, choose the midpoint of the boundary-safe actions.
+				if (uyLower > uyUpper) {
+					uyDDP = 0.5 * (uyLower + uyUpper);
+				}
+				else {
+					uyDDP = std::min(std::max(uyDDP, uyLower), uyUpper);
+				}
 
 				xDDP = xDDP + vxDDP * step + 0.5 * uxDDP * pow(step, 2);
 				yDDP = yDDP + vyDDP * step + 0.5 * uyDDP * pow(step, 2);
 				vxDDP = vxDDP + uxDDP * step;
 				vyDDP = vyDDP + uyDDP * step;
 
-				xInitNext.push_back(xDDP); vxInitNext.push_back(vxDDP);
-				yInitNext.push_back(yDDP); vyInitNext.push_back(vyDDP);
-				axInitNext.push_back(uxDDP); ayInitNext.push_back(uyDDP);
+				xInitNext.push_back(xDDP);
+				vxInitNext.push_back(vxDDP);
+				yInitNext.push_back(yDDP);
+				vyInitNext.push_back(vyDDP);
+				axInitNext.push_back(uxDDP);
+				ayInitNext.push_back(uyDDP);
 			}
+
 			break;
 		}
-		axInitNext.push_back(0.0); ayInitNext.push_back(0.0);
+
+		axInitNext.push_back(0.0);
+		ayInitNext.push_back(0.0);
 
 		Eigen::MatrixXf uxCurr(numsteps, 1), uxPrev(numsteps, 1);
 		Eigen::MatrixXf uyCurr(numsteps, 1), uyPrev(numsteps, 1);
+
 		for (int k = 0; k < numsteps; k++) {
 			uxCurr(k, 0) = axInitNext[k];
 			uxPrev(k, 0) = init_ux[k];
@@ -383,35 +450,56 @@ void DDP::run(Vehicle v) {
 			uyCurr(k, 0) = ayInitNext[k];
 			uyPrev(k, 0) = init_uy[k];
 		}
-		double norm_x = (uxCurr - uxPrev).norm(), norm_y = (uyCurr - uyPrev).norm();
+
+		double norm_x = (uxCurr - uxPrev).norm();
+		double norm_y = (uyCurr - uyPrev).norm();
+
 		fprintf(stderr, "The Norm is equal to: %.4f | %.4f \n", norm_x, norm_y);
 
 		DDP::plotSolution(xInitNext, yInitNext, vxInitNext, vyInitNext, axInitNext, ayInitNext, it);
 
 		for (int k = 0; k < numsteps; k++) {
-			fprintf(stderr, "%d \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \n", k, axInitNext[k], ayInitNext[k], xInitNext[k], yInitNext[k], vxInitNext[k], vyInitNext[k], init_ux[k], init_uy[k]);
+			fprintf(stderr, "%d \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \t %.4f \n",
+				k,
+				axInitNext[k],
+				ayInitNext[k],
+				xInitNext[k],
+				yInitNext[k],
+				vxInitNext[k],
+				vyInitNext[k],
+				init_ux[k],
+				init_uy[k]);
 		}
+
 		fprintf(stderr, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-		// check terminal criterion, update initial trajectories
-		// if (norm_x < 0.001 || it == 0) {
-		if (norm_x < 0.001) {
-		// if ((norm_x < 0.001 && norm_y < 0.01) || it > 100) {
-			opt_x = xInitNext; opt_vx = vxInitNext; opt_ux = axInitNext;
-			opt_y = yInitNext; opt_vy = vyInitNext; opt_uy = ayInitNext;
+		// Check terminal criterion and update initial trajectories.
+		// The original code checked only norm_x. That can terminate while lateral control is still changing.
+		if (norm_x < 0.001 && norm_y < 0.01) {
+			opt_x = xInitNext;
+			opt_vx = vxInitNext;
+			opt_ux = axInitNext;
+
+			opt_y = yInitNext;
+			opt_vy = vyInitNext;
+			opt_uy = ayInitNext;
 
 			break;
 		}
 
-		// test = Eigen::Map<MyMatrix>(axInitNext.data(), s, 1);		
-		init_ux = axInitNext; init_uy = ayInitNext; init_x = xInitNext; init_y = yInitNext; init_vx = vxInitNext; init_vy = vyInitNext;
-		// break;
+		init_ux = axInitNext;
+		init_uy = ayInitNext;
+		init_x = xInitNext;
+		init_y = yInitNext;
+		init_vx = vxInitNext;
+		init_vy = vyInitNext;
 
 		it++;
 	}
 
 	end = clock();
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+
 	fprintf(stderr, "-- DDP iterations: %d | CPU Time: %.5f \n", it, cpu_time_used);
 }
 
@@ -503,7 +591,5 @@ void DDP::plotSolution(vector<double> opt_x, vector<double> opt_y, vector<double
 	fprintf(fout, "'iter':%d,\n", it + 1);
 	fprintf(fout, "}\n\n");
 
-
 	fclose(fout);
 }
-

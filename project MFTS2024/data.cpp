@@ -9,11 +9,15 @@ void Data::read() {
 
 	FILE* input;
 	input = fopen("input.txt", "r");
+	if (input == NULL) {
+		perror("input.txt");
+		exit(1);
+	}
 
 	while (fgets(buf, sizeof(buf), input)) {
 		// fprintf(stderr, "parsing: %s\n", buf);
-		if (buf[0] == '\n')
-			break;
+		if (buf[0] == '\n' || buf[0] == '#')
+			continue;
 
 		if (sscanf(buf, "\"numsteps\":%d", &ival) == 1)
 			this->numsteps = ival;
@@ -55,17 +59,22 @@ void Data::read() {
 			ay0 = dval;
 		
 		/* obstacles */
-		if (sscanf(buf, "\"obst_x(%d,0)\":%lf", &ival, &dval) == 2)
+		if (sscanf(buf, "\"obst_x(%d,0)\":%lf", &ival, &dval) == 2 ||
+			sscanf(buf, "\"obst_x(%d)\":%lf", &ival, &dval) == 2)
 			obsx.push_back(dval);
-		if (sscanf(buf, "\"obst_y(%d,0)\":%lf", &ival, &dval) == 2)
+		if (sscanf(buf, "\"obst_y(%d,0)\":%lf", &ival, &dval) == 2 ||
+			sscanf(buf, "\"obst_y(%d)\":%lf", &ival, &dval) == 2)
 			obsy.push_back(dval);
-		if (sscanf(buf, "\"obst_vx(%d,0)\":%lf", &ival, &dval) == 2)
+		if (sscanf(buf, "\"obst_vx(%d,0)\":%lf", &ival, &dval) == 2 ||
+			sscanf(buf, "\"obst_vx(%d)\":%lf", &ival, &dval) == 2)
 			obsvx.push_back(dval);
-		if (sscanf(buf, "\"obst_vy(%d,0)\":%lf", &ival, &dval) == 2)
+		if (sscanf(buf, "\"obst_vy(%d,0)\":%lf", &ival, &dval) == 2 ||
+			sscanf(buf, "\"obst_vy(%d)\":%lf", &ival, &dval) == 2)
 			obsvy.push_back(dval);
 
 		memset(buf, 0, sizeof(buf));
 	}
+	fclose(input);
 
 	if (!(obsx.size() == obsy.size() && obsx.size() == obsvx.size() && obsx.size() == obsvy.size())) {
 		fputs("incomplete input", stderr);
@@ -74,5 +83,4 @@ void Data::read() {
 	obs_n = obsx.size();
 
 }
-
 
